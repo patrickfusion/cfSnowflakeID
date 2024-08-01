@@ -45,7 +45,7 @@ component accessors="true" {
             }
 
             if (currentTimestamp == variables.lastTimestamp) {
-                variables.sequence = (variables.sequence + 1) & variables.maxSequence;
+                variables.sequence = bitAnd((variables.sequence + 1), variables.maxSequence);
                 if (variables.sequence == 0) {
                     // Sequence Exhausted, wait till next millisecond
                     currentTimestamp = waitNextMillis(currentTimestamp);
@@ -85,6 +85,11 @@ component accessors="true" {
 
     // Parse Snowflake ID
     public array function parse(string id) {
+        var memento = deconstruct( id );
+        return [ memento.timestamp, memento.nodeId, memento.sequence ];
+    }
+
+    public struct function deconstruct(string id) {
         var BigInteger = createObject("java", "java.math.BigInteger");
         var bigId = BigInteger.init(id);
 
@@ -96,7 +101,11 @@ component accessors="true" {
         var nodeId = bigId.and(maskNodeId).shiftRight(variables.SEQUENCE_BITS).longValue();
         var sequence = bigId.and(maskSequence).longValue();
 
-        return [timestamp, nodeId, sequence];
+        return {
+            timestamp : timestamp,
+            nodeId    : nodeId,
+            sequence  : sequence
+        };
     }
 
     // ToString method for Snowflake settings

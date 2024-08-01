@@ -42,6 +42,22 @@ component extends="testbox.system.BaseSpec" {
 							expect( actual ).toBeNumeric();
 							expect( actual ).toHaveLength( 19 );
 						} );
+						then( "multiple nextid calls should return unique snowflake values", () => {
+							var model = new cfSnowflakeID.snowflake();
+							var actual = [ : ];
+							actual[ model.nextId() ] = 1;
+							actual[ model.nextId() ] = 2;
+							actual[ model.nextId() ] = 3;
+							actual[ model.nextId() ] = 4;
+							actual[ model.nextId() ] = 5;
+							actual[ model.nextId() ] = 6;
+							actual[ model.nextId() ] = 7;
+							actual[ model.nextId() ] = 8;
+							actual[ model.nextId() ] = 9;
+							actual[ model.nextId() ] = 10;
+							actual[ model.nextId() ] = 11;
+							expect( actual ).toHaveLength( 11 );
+						} );
 					} );
 				} );
 			} );
@@ -65,6 +81,28 @@ component extends="testbox.system.BaseSpec" {
 							expect( actual[ 1 ] ).toBe( 1722501578015, "timestamp" );
 							expect( actual[ 2 ] ).toBe( 10, "nodeId" );
 							expect( actual[ 3 ] ).toBe( 0, "sequence" );
+						} );
+					} );
+				} );
+				given( "I want to deconstruct the snowflake id", () => {
+					when( "I have new snowflake id created using the defaults", () => {
+						then( "deconstruct should deconstruct the snowflake id", () => {
+							var model = new cfSnowflakeID.snowflake();
+							var actual = model.deconstruct( 1268487251117998080 );
+							expect( actual ).toHaveLength( 3 );
+							expect( actual.timestamp ).toBe( 1722501328020 );
+							expect( actual.nodeId ).toBe( 0 );
+							expect( actual.sequence ).toBe( 0 );
+						} );
+					} );
+					when( "I have new snowflake id created using a nodeId", () => {
+						then( "deconstruct should deconstruct the snowflake id", () => {
+							var model = new cfSnowflakeID.snowflake(nodeid=10);
+							var actual = model.deconstruct( 1268488299673067520 );
+							expect( actual ).toHaveLength( 3 );
+							expect( actual.timestamp ).toBe( 1722501578015 );
+							expect( actual.nodeId ).toBe( 10 );
+							expect( actual.sequence ).toBe( 0 );
 						} );
 					} );
 				} );
