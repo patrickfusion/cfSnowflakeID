@@ -12,8 +12,8 @@ component accessors="true" {
     property name="DEFAULT_CUSTOM_EPOCH" type="numeric" default="1420070400000"; // Sample default, please for your need
 
     // Max values
-    property name="maxNodeId" type="numeric" default="#(2 ^ NODE_ID_BITS - 1)#";
-    property name="maxSequence" type="numeric" default="#(2 ^ SEQUENCE_BITS - 1)#";
+    property name="maxNodeId" type="numeric";
+    property name="maxSequence" type="numeric";
 
     // Variables
     property name="nodeId" type="numeric";
@@ -23,6 +23,10 @@ component accessors="true" {
 
     // Constructor
     public any function init(numeric nodeId=0, numeric customEpoch=DEFAULT_CUSTOM_EPOCH) {
+
+        variables.maxNodeId = (2 ^ variables.NODE_ID_BITS - 1);
+        variables.maxSequence = (2 ^ variables.SEQUENCE_BITS - 1);
+
         if (nodeId < 0 or nodeId > variables.maxNodeId) {
             throw(type="Application", message="NodeId must be between 0 and " & variables.maxNodeId);
         }
