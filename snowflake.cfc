@@ -84,7 +84,8 @@ component accessors="true" {
         var BigInteger = createObject("java", "java.math.BigInteger");
         var bigId = BigInteger.init(id);
 
-        var maskNodeId = (BigInteger.valueOf(1).shiftLeft(variables.NODE_ID_BITS).subtract(BigInteger.ONE)).shiftLeft(variables.SEQUENCE_BITS);
+        var shiftedNodeId = BigInteger.valueOf(1).shiftLeft(variables.NODE_ID_BITS).subtract(BigInteger.ONE);
+        var maskNodeId = shiftedNodeId.shiftLeft(variables.SEQUENCE_BITS);
         var maskSequence = BigInteger.valueOf(1).shiftLeft(variables.SEQUENCE_BITS).subtract(BigInteger.ONE);
 
         var timestamp = bigId.shiftRight(variables.NODE_ID_BITS + variables.SEQUENCE_BITS).longValue() + variables.customEpoch;
