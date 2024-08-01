@@ -1,0 +1,11 @@
+{
+    "name":"cfSnowflakeID",
+    "web":{
+        "http":{
+            "port":"7777"
+        }
+    },
+    "app":{
+        "cfengine":"lucee"
+    }
+}

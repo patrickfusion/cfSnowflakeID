@@ -12,8 +12,8 @@ component accessors="true" {
     property name="DEFAULT_CUSTOM_EPOCH" type="numeric" default="1420070400000"; // Sample default, please for your need
 
     // Max values
-    property name="maxNodeId" type="numeric" default="#(2 ^ NODE_ID_BITS - 1)#";
-    property name="maxSequence" type="numeric" default="#(2 ^ SEQUENCE_BITS - 1)#";
+    property name="maxNodeId" type="numeric";
+    property name="maxSequence" type="numeric";
 
     // Variables
     property name="nodeId" type="numeric";
@@ -23,6 +23,10 @@ component accessors="true" {
 
     // Constructor
     public any function init(numeric nodeId=0, numeric customEpoch=DEFAULT_CUSTOM_EPOCH) {
+
+        variables.maxNodeId = (2 ^ variables.NODE_ID_BITS - 1);
+        variables.maxSequence = (2 ^ variables.SEQUENCE_BITS - 1);
+
         if (nodeId < 0 or nodeId > variables.maxNodeId) {
             throw(type="Application", message="NodeId must be between 0 and " & variables.maxNodeId);
         }
@@ -41,7 +45,7 @@ component accessors="true" {
             }
 
             if (currentTimestamp == variables.lastTimestamp) {
-                variables.sequence = (variables.sequence + 1) & variables.maxSequence;
+                variables.sequence = bitAnd((variables.sequence + 1), variables.maxSequence);
                 if (variables.sequence == 0) {
                     // Sequence Exhausted, wait till next millisecond
                     currentTimestamp = waitNextMillis(currentTimestamp);
@@ -81,17 +85,27 @@ component accessors="true" {
 
     // Parse Snowflake ID
     public array function parse(string id) {
+        var memento = deconstruct( id );
+        return [ memento.timestamp, memento.nodeId, memento.sequence ];
+    }
+
+    public struct function deconstruct(string id) {
         var BigInteger = createObject("java", "java.math.BigInteger");
         var bigId = BigInteger.init(id);
 
-        var maskNodeId = (BigInteger.valueOf(1).shiftLeft(variables.NODE_ID_BITS).subtract(BigInteger.ONE)).shiftLeft(variables.SEQUENCE_BITS);
+        var shiftedNodeId = BigInteger.valueOf(1).shiftLeft(variables.NODE_ID_BITS).subtract(BigInteger.ONE);
+        var maskNodeId = shiftedNodeId.shiftLeft(variables.SEQUENCE_BITS);
         var maskSequence = BigInteger.valueOf(1).shiftLeft(variables.SEQUENCE_BITS).subtract(BigInteger.ONE);
 
         var timestamp = bigId.shiftRight(variables.NODE_ID_BITS + variables.SEQUENCE_BITS).longValue() + variables.customEpoch;
         var nodeId = bigId.and(maskNodeId).shiftRight(variables.SEQUENCE_BITS).longValue();
         var sequence = bigId.and(maskSequence).longValue();
 
-        return [timestamp, nodeId, sequence];
+        return {
+            timestamp : timestamp,
+            nodeId    : nodeId,
+            sequence  : sequence
+        };
     }
 
     // ToString method for Snowflake settings

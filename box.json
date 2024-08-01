@@ -1,0 +1,26 @@
+{
+    "author": "Patrick Flynn",
+    "homepage": "https://github.com/patrickfusion/cfSnowflakeID",
+    "bugs": "https://github.com/patrickfusion/cfSnowflakeID/issues",
+    "version": "0.1.0",
+    "licence": [
+        {
+            "type": "apache",
+            "url": "https://opensource.org/license/apache-2-0"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "URL": "https://github.com/patrickfusion/cfSnowflakeID"
+    },
+    "devDependencies": {
+        "testbox": "^5.4.0+7"
+    },
+    "installPaths": {
+        "testbox": "testbox/"
+    },
+    "testbox": {
+        "runner": "http://localhost:7777/tests/runner.cfm",
+        "verbose": false
+    }
+}
